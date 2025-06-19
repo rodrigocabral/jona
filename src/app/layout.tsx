@@ -5,10 +5,10 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Jona - Conecte-se de verdade',
+  title: 'JonA - Conecte-se de verdade',
   description: 'Conecte-se de verdade com quem compartilha seus valores',
   keywords: ['conexões', 'valores', 'relacionamentos', 'comunidade'],
-  authors: [{ name: 'Jona Team' }],
+  authors: [{ name: 'JonA Team' }],
 }
 
 export const viewport: Viewport = {

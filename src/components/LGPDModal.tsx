@@ -21,7 +21,7 @@ export default function LGPDModal({ isOpen, onAccept, onDecline }: LGPDModalProp
           </div>
           <DialogDescription className="text-left space-y-3">
             <p>
-              Para oferecer a melhor experiência no Jona, precisamos coletar e processar alguns dados pessoais:
+              Para oferecer a melhor experiência no JonA, precisamos coletar e processar alguns dados pessoais:
             </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-start space-x-2">

@@ -1,8 +1,8 @@
-# Jona – Onboarding (Mapa de Compatibilidade)
+# JonA – Onboarding (Mapa de Compatibilidade)
 
 ## Overview
 
-Coleta de dados comportamentais e emocionais para alimentar o sistema de sugestão de conexões do Jona.
+Coleta de dados comportamentais e emocionais para alimentar o sistema de sugestão de conexões do JonA.
 
 ## Problem Statement
 

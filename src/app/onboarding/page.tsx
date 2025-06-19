@@ -133,7 +133,7 @@ export default function OnboardingPage() {
                 <Heart className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold jona-text-gradient">Jona</h1>
+                <h1 className="text-lg font-bold jona-text-gradient">JonA</h1>
                 <p className="text-xs text-muted-foreground">Mapa de Compatibilidade</p>
               </div>
             </div>

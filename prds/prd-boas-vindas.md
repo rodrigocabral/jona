@@ -1,12 +1,12 @@
-# Jona – Tela de Boas-Vindas
+# JonA – Tela de Boas-Vindas
 
 ## Overview
 
-Tela inicial da aplicação Jona, com objetivo de apresentar a proposta da plataforma e iniciar o processo de onboarding do usuário.
+Tela inicial da aplicação JonA, com objetivo de apresentar a proposta da plataforma e iniciar o processo de onboarding do usuário.
 
 ## Problem Statement
 
-Usuários precisam entender rapidamente o propósito do Jona e sentir confiança para iniciar o uso da plataforma.
+Usuários precisam entender rapidamente o propósito do JonA e sentir confiança para iniciar o uso da plataforma.
 
 ## User Stories
 
@@ -18,7 +18,7 @@ Usuários precisam entender rapidamente o propósito do Jona e sentir confiança
 ### Functional Requirements
 
 - Exibir logo centralizado
-- Título “Bem-vindo ao Jona” (verde)
+- Título “Bem-vindo ao JonA” (verde)
 - Subtítulo “Conecte-se de verdade com quem compartilha seus valores.” (azul)
 - Botão “Começar”
 - Pop-up LGPD com opção de aceitar ou recusar

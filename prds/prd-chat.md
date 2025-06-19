@@ -1,4 +1,4 @@
-# Jona – Chat
+# JonA – Chat
 
 ## Overview
 

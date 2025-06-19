@@ -1,4 +1,4 @@
-# Jona – Diário Emocional
+# JonA – Diário Emocional
 
 ## Overview
 
