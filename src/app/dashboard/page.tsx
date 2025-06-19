@@ -58,7 +58,7 @@ export default function DashboardPage() {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold jona-text-gradient">Jona</h1>
+            <h1 className="text-2xl font-bold jona-text-gradient">JonA</h1>
             <p className="text-sm text-muted-foreground">Suas conexões aguardam</p>
           </div>
           <Button variant="ghost" size="icon" aria-label="Configurações">

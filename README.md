@@ -1,6 +1,6 @@
-# 🕊️ Jona - Plataforma de Conexões Autênticas
+# 🕊️ JonA - Plataforma de Conexões Autênticas
 
-Jona é uma plataforma que promove conexões humanas autênticas através de tecnologia empática e inteligência artificial responsável.
+JonA é uma plataforma que promove conexões humanas autênticas através de tecnologia empática e inteligência artificial responsável.
 
 ## 🚀 Como Executar o Projeto
 
@@ -103,11 +103,11 @@ O projeto requer as seguintes variáveis de ambiente (veja `env.example`):
 ## Tela 1: **Boas-Vindas**
 
 * Fundo branco, logo (100x100px) centralizado
-* Título: `"Bem-vindo ao Jona"` (Verde, 24px, negrito)
+* Título: `"Bem-vindo ao JonA"` (Verde, 24px, negrito)
 * Subtítulo: `"Conecte-se de verdade..."` (Azul, 16px)
 * Botão: `"Começar"` (Azul)
 * Pop-up LGPD com texto e botão **Aceitar/Recusar**
-* Rodapé: `Jona © 2025`
+* Rodapé: `JonA © 2025`
 
 ### Interações:
 
@@ -257,4 +257,4 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**Jona © 2025** - Conectando pessoas, construindo comunidades.
+**JonA © 2025** - Conectando pessoas, construindo comunidades.

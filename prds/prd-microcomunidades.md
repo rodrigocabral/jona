@@ -1,4 +1,4 @@
-# Jona – Microcomunidades
+# JonA – Microcomunidades
 
 ## Overview
 

@@ -1,8 +1,8 @@
-# Jona – Telas Iniciais e Onboarding
+# JonA – Telas Iniciais e Onboarding
 
 ## Overview
 
-O Jona é uma plataforma de conexões empáticas que visa unir pessoas com valores semelhantes. Este documento cobre as três primeiras fases da interface: boas-vindas, onboarding e o dashboard inicial, além de ferramentas de interação como chat, agenda, diário emocional e microcomunidades.
+O JonA é uma plataforma de conexões empáticas que visa unir pessoas com valores semelhantes. Este documento cobre as três primeiras fases da interface: boas-vindas, onboarding e o dashboard inicial, além de ferramentas de interação como chat, agenda, diário emocional e microcomunidades.
 
 Essas funcionalidades têm como objetivo guiar o usuário desde a chegada até o início de conexões significativas, mantendo a privacidade, acessibilidade e responsividade como pilares centrais.
 

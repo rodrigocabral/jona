@@ -47,7 +47,7 @@ export default function WelcomePage() {
                 <Heart className="w-10 h-10 text-white" />
               </div>
               <h1 className="text-3xl font-bold text-jona-green-700 mb-2">
-                Bem-vindo ao Jona
+                Bem-vindo ao JonA
               </h1>
               <p className="text-lg text-jona-blue-600 leading-relaxed">
                 Conecte-se de verdade com quem compartilha seus valores.
@@ -85,7 +85,7 @@ export default function WelcomePage() {
                 onClick={handleStart}
                 size="lg" 
                 className="w-full text-lg py-6 font-medium"
-                aria-label="Começar cadastro no Jona"
+                aria-label="Começar cadastro no JonA"
               >
                 Começar
               </Button>

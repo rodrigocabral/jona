@@ -1,4 +1,4 @@
-# Jona – Technologies Chosen
+# JonA – Technologies Chosen
 
 | Camada        | Tecnologia                      |
 |---------------|----------------------------------|

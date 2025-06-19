@@ -15,7 +15,7 @@ const mockEvents = [
   {
     id: '1',
     title: 'Café com Ana Silva',
-    description: 'Primeira conversa após conexão no Jona',
+    description: 'Primeira conversa após conexão no JonA',
     date: new Date('2024-01-20T15:00:00'),
     location: 'Café Central, Vila Madalena',
     reminderSet: true,

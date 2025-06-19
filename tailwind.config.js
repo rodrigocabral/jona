@@ -50,7 +50,7 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Jona brand colors
+        // JonA brand colors
         jona: {
           green: {
             50: '#f0fdf4',

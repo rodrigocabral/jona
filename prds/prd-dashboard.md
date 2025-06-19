@@ -1,4 +1,4 @@
-# Jona – Dashboard
+# JonA – Dashboard
 
 ## Overview
 

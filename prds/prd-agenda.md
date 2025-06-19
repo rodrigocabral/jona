@@ -1,4 +1,4 @@
-# Jona – Agenda de Conexões
+# JonA – Agenda de Conexões
 
 ## Overview
 
