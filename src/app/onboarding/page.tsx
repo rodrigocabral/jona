@@ -1,14 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ChevronLeft, ChevronRight, Instagram, Heart, Shield, Check, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Instagram, Heart, Shield, Check, X, AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuthContext } from '@/lib/contexts/AuthContext'
+import { saveOnboardingResponses, createOrUpdateUserProfile, updateInstagramConnection } from '@/lib/onboarding'
 
 const questions = [
   {
@@ -45,11 +47,53 @@ const questions = [
 
 export default function OnboardingPage() {
   const router = useRouter()
+  const { user, loading: authLoading, error: authError } = useAuthContext()
   const [currentQuestion, setCurrentQuestion] = useState(1)
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [showInstagramDialog, setShowInstagramDialog] = useState(false)
   const [instagramConnected, setInstagramConnected] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login')
+    }
+  }, [user, authLoading, router])
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full jona-gradient flex items-center justify-center">
+            <Heart className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Carregando...</h3>
+          <div className="animate-spin w-6 h-6 border-2 border-jona-green-600 border-t-transparent rounded-full mx-auto"></div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state if authentication failed
+  if (authError || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+          <h3 className="text-lg font-semibold mb-2">Erro de Autenticação</h3>
+          <p className="text-muted-foreground mb-4">
+            {authError || 'Usuário não autenticado'}
+          </p>
+          <Button onClick={() => router.push('/login')}>
+            Fazer Login
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   const progress = (currentQuestion / questions.length) * 100
   const currentAnswer = answers[currentQuestion] || ''
@@ -81,12 +125,27 @@ export default function OnboardingPage() {
     }
   }
 
-  const handleInstagramConnect = () => {
-    // In a real app, this would initiate OAuth 2.0 flow with Meta Graph API
-    console.log('Connecting to Instagram...')
-    setInstagramConnected(true)
-    setShowInstagramDialog(false)
-    handleFinishOnboarding()
+  const handleInstagramConnect = async () => {
+    try {
+      // In a real app, this would initiate OAuth 2.0 flow with Meta Graph API
+      console.log('Connecting to Instagram...')
+      
+      // For now, we'll simulate the connection
+      if (user) {
+        await updateInstagramConnection(user.uid, true, {
+          username: 'user_instagram', // This would come from Instagram API
+          profilePicture: user.photoURL || '',
+          followersCount: 0
+        })
+      }
+      
+      setInstagramConnected(true)
+      setShowInstagramDialog(false)
+      handleFinishOnboarding()
+    } catch (error) {
+      console.error('Error connecting Instagram:', error)
+      setError('Erro ao conectar Instagram. Tente novamente.')
+    }
   }
 
   const handleSkipInstagram = () => {
@@ -95,9 +154,14 @@ export default function OnboardingPage() {
   }
 
   const handleFinishOnboarding = async () => {
+    if (!user) {
+      setError('Usuário não autenticado')
+      return
+    }
+
     setIsSubmitting(true)
+    setError(null)
     
-    // Simulate API call to save encrypted responses
     try {
       console.log('Saving onboarding responses:', {
         answers,
@@ -105,16 +169,24 @@ export default function OnboardingPage() {
         timestamp: new Date().toISOString()
       })
       
-      // In a real app, this would:
-      // 1. Encrypt responses with AES-256
-      // 2. Save to MongoDB
-      // 3. Mark user as onboarding completed
+      // Save onboarding responses to Firebase
+      await saveOnboardingResponses({
+        userId: user.uid,
+        answers,
+        instagramConnected
+      })
+
+      // Update user profile to mark onboarding as completed
+      await createOrUpdateUserProfile({
+        onboardingCompleted: true,
+        instagramConnected
+      })
       
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
+      console.log('Onboarding completed successfully')
       router.push('/dashboard')
     } catch (error) {
       console.error('Error saving onboarding:', error)
+      setError('Erro ao salvar respostas. Tente novamente.')
     } finally {
       setIsSubmitting(false)
     }
@@ -153,6 +225,29 @@ export default function OnboardingPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
+        {/* Error Display */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <div>
+              <p className="text-red-800 text-sm font-medium">Erro</p>
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setError(null)}
+              className="ml-auto"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </motion.div>
+        )}
+
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestion}
@@ -239,7 +334,7 @@ export default function OnboardingPage() {
             <div className="space-y-3">
               <div className="flex items-start space-x-2">
                 <Shield className="w-4 h-4 text-jona-green-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Seus dados são anonimizados e criptografados</span>
+                <span className="text-sm">Seus dados são criptografados e seguros</span>
               </div>
               <div className="flex items-start space-x-2">
                 <Shield className="w-4 h-4 text-jona-green-600 mt-0.5 flex-shrink-0" />
@@ -289,7 +384,7 @@ export default function OnboardingPage() {
             </div>
             <h3 className="text-lg font-semibold mb-2">Finalizando seu perfil...</h3>
             <p className="text-muted-foreground text-sm">
-              Estamos preparando suas sugestões de conexão
+              Salvando suas respostas no Firebase
             </p>
             <div className="mt-4">
               <div className="animate-spin w-6 h-6 border-2 border-jona-green-600 border-t-transparent rounded-full mx-auto"></div>
