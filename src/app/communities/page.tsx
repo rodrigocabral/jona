@@ -1,23 +1,33 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { Users, Plus, Search, Calendar, MapPin, Hash, Video, Settings, Clock } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { motion } from 'framer-motion';
+import {
+  Calendar,
+  Clock,
+  Hash,
+  MapPin,
+  Plus,
+  Search,
+  Settings,
+  Users,
+  Video,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import BottomNavigation from '@/components/BottomNavigation'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import BottomNavigation from '@/components/BottomNavigation';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 // Mock data for communities
 const mockCommunities = [
@@ -65,7 +75,7 @@ const mockCommunities = [
     location: 'São Paulo, SP',
     avatar: '',
   },
-]
+];
 
 // Mock data for scheduled lives
 const scheduledLives = [
@@ -85,45 +95,47 @@ const scheduledLives = [
     duration: 60,
     participants: 8,
   },
-]
+];
 
 export default function CommunitiesPage() {
-  const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newCommunity, setNewCommunity] = useState({
     name: '',
     description: '',
     tags: '',
-  })
+  });
 
   const handleJoinCommunity = (communityId: string) => {
-    console.log('Joining community:', communityId)
+    console.log('Joining community:', communityId);
     // In a real app, this would send a join request
-  }
+  };
 
   const handleLeaveCommunity = (communityId: string) => {
-    console.log('Leaving community:', communityId)
+    console.log('Leaving community:', communityId);
     // In a real app, this would send a leave request
-  }
+  };
 
   const handleCreateCommunity = () => {
-    console.log('Creating community:', newCommunity)
+    console.log('Creating community:', newCommunity);
     // In a real app, this would create a new community
-    setShowCreateDialog(false)
-    setNewCommunity({ name: '', description: '', tags: '' })
-  }
+    setShowCreateDialog(false);
+    setNewCommunity({ name: '', description: '', tags: '' });
+  };
 
   const handleSettingsClick = () => {
-    router.push('/profile')
-  }
+    router.push('/profile');
+  };
 
   const filteredCommunities = mockCommunities.filter(
     community =>
       community.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       community.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      community.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-  )
+      community.tags.some(tag =>
+        tag.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+  );
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('pt-BR', {
@@ -131,8 +143,8 @@ export default function CommunitiesPage() {
       month: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-    })
-  }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50 pb-20">
@@ -140,8 +152,12 @@ export default function CommunitiesPage() {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold jona-text-gradient">Comunidades</h1>
-            <p className="text-sm text-muted-foreground">Conecte-se com grupos afins</p>
+            <h1 className="text-2xl font-bold jona-text-gradient">
+              Comunidades
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Conecte-se com grupos afins
+            </p>
           </div>
           <Button
             variant="ghost"
@@ -188,18 +204,26 @@ export default function CommunitiesPage() {
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div>
-                  <label htmlFor="community-name" className="text-sm font-medium">
+                  <label
+                    htmlFor="community-name"
+                    className="text-sm font-medium"
+                  >
                     Nome da Comunidade
                   </label>
                   <Input
                     id="community-name"
                     placeholder="Ex: Yoga & Mindfulness"
                     value={newCommunity.name}
-                    onChange={e => setNewCommunity({ ...newCommunity, name: e.target.value })}
+                    onChange={e =>
+                      setNewCommunity({ ...newCommunity, name: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label htmlFor="community-description" className="text-sm font-medium">
+                  <label
+                    htmlFor="community-description"
+                    className="text-sm font-medium"
+                  >
                     Descrição
                   </label>
                   <Textarea
@@ -207,20 +231,28 @@ export default function CommunitiesPage() {
                     placeholder="Descreva o propósito da sua comunidade..."
                     value={newCommunity.description}
                     onChange={e =>
-                      setNewCommunity({ ...newCommunity, description: e.target.value })
+                      setNewCommunity({
+                        ...newCommunity,
+                        description: e.target.value,
+                      })
                     }
                     rows={3}
                   />
                 </div>
                 <div>
-                  <label htmlFor="community-tags" className="text-sm font-medium">
+                  <label
+                    htmlFor="community-tags"
+                    className="text-sm font-medium"
+                  >
                     Tags (separadas por vírgula)
                   </label>
                   <Input
                     id="community-tags"
                     placeholder="Ex: yoga, meditação, bem-estar"
                     value={newCommunity.tags}
-                    onChange={e => setNewCommunity({ ...newCommunity, tags: e.target.value })}
+                    onChange={e =>
+                      setNewCommunity({ ...newCommunity, tags: e.target.value })
+                    }
                   />
                 </div>
                 <Button
@@ -257,7 +289,9 @@ export default function CommunitiesPage() {
                   >
                     <div>
                       <h3 className="font-semibold text-sm">{live.title}</h3>
-                      <p className="text-xs text-muted-foreground">{live.community}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {live.community}
+                      </p>
                       <div className="flex items-center space-x-4 mt-1 text-xs text-muted-foreground">
                         <div className="flex items-center space-x-1">
                           <Clock className="w-3 h-3" />
@@ -326,7 +360,9 @@ export default function CommunitiesPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">{community.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {community.description}
+                      </p>
 
                       <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
                         <div className="flex items-center space-x-1">
@@ -342,7 +378,9 @@ export default function CommunitiesPage() {
                       {community.nextEvent && (
                         <div className="flex items-center space-x-1 mt-2 text-xs text-jona-blue-600">
                           <Calendar className="w-3 h-3" />
-                          <span>Próximo evento: {formatDate(community.nextEvent)}</span>
+                          <span>
+                            Próximo evento: {formatDate(community.nextEvent)}
+                          </span>
                         </div>
                       )}
 
@@ -394,9 +432,12 @@ export default function CommunitiesPage() {
             className="text-center py-8"
           >
             <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Nenhuma comunidade encontrada</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Nenhuma comunidade encontrada
+            </h3>
             <p className="text-muted-foreground mb-4">
-              Não encontramos comunidades que correspondam à sua busca por "{searchTerm}"
+              Não encontramos comunidades que correspondam à sua busca por "
+              {searchTerm}"
             </p>
             <Button
               onClick={() => setShowCreateDialog(true)}
@@ -411,5 +452,5 @@ export default function CommunitiesPage() {
 
       <BottomNavigation currentPage="communities" />
     </div>
-  )
+  );
 }

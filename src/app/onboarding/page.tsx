@@ -1,71 +1,72 @@
-'use client'
+'use client';
 
-import { collection, doc, getDoc, getDocs, limit, query, where } from 'firebase/firestore'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion';
 import {
+  AlertCircle,
   ChevronLeft,
   ChevronRight,
-  Instagram,
   Heart,
+  Instagram,
   Shield,
-  Check,
   X,
-  AlertCircle,
-} from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Progress } from '@/components/ui/progress'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuthContext } from '@/lib/contexts/AuthContext'
-import { db } from '@/lib/firebase'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  saveOnboardingResponses,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuthContext } from '@/lib/contexts/AuthContext';
+import {
   createOrUpdateUserProfile,
-  updateInstagramConnection,
   getOnboardingQuestions,
   Question,
-} from '@/lib/onboarding'
-
+  saveOnboardingResponses,
+  updateInstagramConnection,
+} from '@/lib/onboarding';
 
 export default function OnboardingPage() {
-  const router = useRouter()
-  const { user, loading: authLoading, error: authError } = useAuthContext()
-  const [questions, setQuestions] = useState<Question[]>([])
-  const [questionsLoading, setQuestionsLoading] = useState(true)
-  const [currentQuestion, setCurrentQuestion] = useState(1)
-  const [answers, setAnswers] = useState<Record<number, string>>({})
-  const [showInstagramDialog, setShowInstagramDialog] = useState(false)
-  const [instagramConnected, setInstagramConnected] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const { user, loading: authLoading, error: authError } = useAuthContext();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionsLoading, setQuestionsLoading] = useState(true);
+  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [showInstagramDialog, setShowInstagramDialog] = useState(false);
+  const [instagramConnected, setInstagramConnected] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch questions from Firebase on component mount
   useEffect(() => {
     async function fetchQuestions() {
       try {
-        setQuestionsLoading(true)
-        console.log('📋 Fetching onboarding questions...')
-        const fetchedQuestions = await getOnboardingQuestions()
-        setQuestions(fetchedQuestions)
-        console.log(`✅ Loaded ${fetchedQuestions.length} questions`)
+        setQuestionsLoading(true);
+        console.log('📋 Fetching onboarding questions...');
+        const fetchedQuestions = await getOnboardingQuestions();
+        setQuestions(fetchedQuestions);
+        console.log(`✅ Loaded ${fetchedQuestions.length} questions`);
       } catch (error) {
-        console.error('❌ Error loading questions:', error)
-        setError('Erro ao carregar perguntas. Tente recarregar a página.')
+        console.error('❌ Error loading questions:', error);
+        setError('Erro ao carregar perguntas. Tente recarregar a página.');
       } finally {
-        setQuestionsLoading(false)
+        setQuestionsLoading(false);
       }
     }
 
-    fetchQuestions()
-  }, [])
+    fetchQuestions();
+  }, []);
 
   useEffect(() => {
-    console.log('📋 Onboarding page loaded for user:', user?.uid)
-  }, [user])
+    console.log('📋 Onboarding page loaded for user:', user?.uid);
+  }, [user]);
 
   // Show loading state while checking authentication or loading questions
   if (authLoading || questionsLoading) {
@@ -81,7 +82,7 @@ export default function OnboardingPage() {
           <div className="animate-spin w-6 h-6 border-2 border-jona-green-600 border-t-transparent rounded-full mx-auto"></div>
         </div>
       </div>
-    )
+    );
   }
 
   // Show error state if authentication failed
@@ -91,11 +92,13 @@ export default function OnboardingPage() {
         <div className="text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
           <h3 className="text-lg font-semibold mb-2">Erro de Autenticação</h3>
-          <p className="text-muted-foreground mb-4">{authError || 'Usuário não autenticado'}</p>
+          <p className="text-muted-foreground mb-4">
+            {authError || 'Usuário não autenticado'}
+          </p>
           <Button onClick={() => router.push('/login')}>Fazer Login</Button>
         </div>
       </div>
-    )
+    );
   }
 
   // Show error state if no questions loaded
@@ -104,50 +107,54 @@ export default function OnboardingPage() {
       <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 text-orange-500" />
-          <h3 className="text-lg font-semibold mb-2">Perguntas não encontradas</h3>
+          <h3 className="text-lg font-semibold mb-2">
+            Perguntas não encontradas
+          </h3>
           <p className="text-muted-foreground mb-4">
             Não foi possível carregar as perguntas do onboarding.
           </p>
-          <Button onClick={() => window.location.reload()}>Tentar Novamente</Button>
+          <Button onClick={() => window.location.reload()}>
+            Tentar Novamente
+          </Button>
         </div>
       </div>
-    )
+    );
   }
 
-  const progress = (currentQuestion / questions.length) * 100
-  const currentAnswer = answers[currentQuestion] || ''
-  const isLastQuestion = currentQuestion === questions.length
-  const canProceed = currentAnswer.trim().length >= 10
+  const progress = (currentQuestion / questions.length) * 100;
+  const currentAnswer = answers[currentQuestion] || '';
+  const isLastQuestion = currentQuestion === questions.length;
+  const canProceed = currentAnswer.trim().length >= 10;
 
   const handleAnswerChange = (value: string) => {
     if (value.length <= 500) {
       setAnswers(prev => ({
         ...prev,
         [currentQuestion]: value,
-      }))
+      }));
     }
-  }
+  };
 
   const handleNext = () => {
     if (canProceed) {
       if (isLastQuestion) {
-        setShowInstagramDialog(true)
+        setShowInstagramDialog(true);
       } else {
-        setCurrentQuestion(prev => prev + 1)
+        setCurrentQuestion(prev => prev + 1);
       }
     }
-  }
+  };
 
   const handleBack = () => {
     if (currentQuestion > 1) {
-      setCurrentQuestion(prev => prev - 1)
+      setCurrentQuestion(prev => prev - 1);
     }
-  }
+  };
 
   const handleInstagramConnect = async () => {
     try {
       // In a real app, this would initiate OAuth 2.0 flow with Meta Graph API
-      console.log('Connecting to Instagram...')
+      console.log('Connecting to Instagram...');
 
       // For now, we'll simulate the connection
       if (user) {
@@ -155,42 +162,42 @@ export default function OnboardingPage() {
           username: 'user_instagram', // This would come from Instagram API
           profilePicture: user.photoURL || '',
           followersCount: 0,
-        })
+        });
       }
 
-      setInstagramConnected(true)
-      setShowInstagramDialog(false)
-      handleFinishOnboarding()
+      setInstagramConnected(true);
+      setShowInstagramDialog(false);
+      handleFinishOnboarding();
     } catch (error) {
-      console.error('Error connecting Instagram:', error)
-      setError('Erro ao conectar Instagram. Tente novamente.')
+      console.error('Error connecting Instagram:', error);
+      setError('Erro ao conectar Instagram. Tente novamente.');
     }
-  }
+  };
 
   const handleSkipInstagram = () => {
-    setShowInstagramDialog(false)
-    handleFinishOnboarding()
-  }
+    setShowInstagramDialog(false);
+    handleFinishOnboarding();
+  };
 
   const handleFinishOnboarding = async () => {
     if (!user) {
-      setError('Usuário não autenticado')
-      return
+      setError('Usuário não autenticado');
+      return;
     }
 
     // Validate that all questions have been answered
     const unansweredQuestions = questions.filter(
       q => !answers[q.id] || answers[q.id].trim().length === 0
-    )
+    );
     if (unansweredQuestions.length > 0) {
       setError(
         `Por favor, responda todas as perguntas. Faltam: ${unansweredQuestions.length} pergunta(s)`
-      )
-      return
+      );
+      return;
     }
 
-    setIsSubmitting(true)
-    setError(null)
+    setIsSubmitting(true);
+    setError(null);
 
     try {
       console.log('💾 Saving onboarding responses:', {
@@ -204,7 +211,7 @@ export default function OnboardingPage() {
         })),
         instagramConnected,
         timestamp: new Date().toISOString(),
-      })
+      });
 
       // Save onboarding responses to Firebase
       await saveOnboardingResponses({
@@ -212,29 +219,29 @@ export default function OnboardingPage() {
         answers,
         questions,
         instagramConnected,
-      })
+      });
 
-      console.log('✅ Onboarding responses saved to Firebase')
+      console.log('✅ Onboarding responses saved to Firebase');
 
       // Update user profile to mark onboarding as completed
       await createOrUpdateUserProfile({
         onboardingCompleted: true,
         instagramConnected,
-      })
+      });
 
-      console.log('✅ User profile updated - onboarding marked as completed')
-      console.log('🎉 Onboarding process completed successfully!')
+      console.log('✅ User profile updated - onboarding marked as completed');
+      console.log('🎉 Onboarding process completed successfully!');
 
-      router.push('/dashboard')
+      router.push('/dashboard');
     } catch (error) {
-      console.error('❌ Error saving onboarding:', error)
-      setError('Erro ao salvar respostas. Tente novamente.')
+      console.error('❌ Error saving onboarding:', error);
+      setError('Erro ao salvar respostas. Tente novamente.');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const currentQuestionData = questions.find(q => q.id === currentQuestion)
+  const currentQuestionData = questions.find(q => q.id === currentQuestion);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50">
@@ -248,7 +255,9 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h1 className="text-lg font-bold jona-text-gradient">JonA</h1>
-                <p className="text-xs text-muted-foreground">Mapa de Compatibilidade</p>
+                <p className="text-xs text-muted-foreground">
+                  Mapa de Compatibilidade
+                </p>
               </div>
             </div>
             <div className="text-right">
@@ -279,7 +288,12 @@ export default function OnboardingPage() {
               <p className="text-red-800 text-sm font-medium">Erro</p>
               <p className="text-red-700 text-sm">{error}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setError(null)} className="ml-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setError(null)}
+              className="ml-auto"
+            >
               <X className="w-4 h-4" />
             </Button>
           </motion.div>
@@ -328,7 +342,9 @@ export default function OnboardingPage() {
                     </span>
                     <span
                       className={`${
-                        currentAnswer.length > 450 ? 'text-orange-600' : 'text-muted-foreground'
+                        currentAnswer.length > 450
+                          ? 'text-orange-600'
+                          : 'text-muted-foreground'
                       }`}
                     >
                       {currentAnswer.length}/500
@@ -352,10 +368,16 @@ export default function OnboardingPage() {
                     onClick={handleNext}
                     disabled={!canProceed}
                     className="bg-jona-green-600 hover:bg-jona-green-700"
-                    aria-label={isLastQuestion ? 'Finalizar onboarding' : 'Próxima pergunta'}
+                    aria-label={
+                      isLastQuestion
+                        ? 'Finalizar onboarding'
+                        : 'Próxima pergunta'
+                    }
                   >
                     {isLastQuestion ? 'Finalizar' : 'Próximo'}
-                    {!isLastQuestion && <ChevronRight className="w-4 h-4 ml-2" />}
+                    {!isLastQuestion && (
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    )}
                   </Button>
                 </div>
               </CardContent>
@@ -376,22 +398,28 @@ export default function OnboardingPage() {
 
           <div className="space-y-4">
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Conecte seu Instagram para enriquecer seu perfil e receber sugestões mais precisas de
-              conexões baseadas em seus interesses.
+              Conecte seu Instagram para enriquecer seu perfil e receber
+              sugestões mais precisas de conexões baseadas em seus interesses.
             </p>
 
             <div className="space-y-3">
               <div className="flex items-start space-x-2">
                 <Shield className="w-4 h-4 text-jona-green-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Seus dados são criptografados e seguros</span>
+                <span className="text-sm">
+                  Seus dados são criptografados e seguros
+                </span>
               </div>
               <div className="flex items-start space-x-2">
                 <Shield className="w-4 h-4 text-jona-green-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Não publicamos nada em seu perfil</span>
+                <span className="text-sm">
+                  Não publicamos nada em seu perfil
+                </span>
               </div>
               <div className="flex items-start space-x-2">
                 <Shield className="w-4 h-4 text-jona-green-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Você pode desconectar a qualquer momento</span>
+                <span className="text-sm">
+                  Você pode desconectar a qualquer momento
+                </span>
               </div>
             </div>
 
@@ -431,12 +459,16 @@ export default function OnboardingPage() {
             <div className="w-12 h-12 mx-auto mb-4 rounded-full jona-gradient flex items-center justify-center">
               <Heart className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Finalizando seu perfil...</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Finalizando seu perfil...
+            </h3>
             <div className="text-sm text-muted-foreground space-y-1">
               <p>💾 Salvando {Object.keys(answers).length} respostas</p>
               <p>👤 Atualizando perfil do usuário</p>
               <p>
-                {instagramConnected ? '📱 Conectando Instagram' : '⏭️ Prosseguindo sem Instagram'}
+                {instagramConnected
+                  ? '📱 Conectando Instagram'
+                  : '⏭️ Prosseguindo sem Instagram'}
               </p>
             </div>
             <div className="mt-4">
@@ -446,5 +478,5 @@ export default function OnboardingPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

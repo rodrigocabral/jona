@@ -1,42 +1,52 @@
-'use client'
+'use client';
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, Mail, Lock, Eye, EyeOff, AlertCircle, User, Chrome, Check, X } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  AlertCircle,
+  Check,
+  Chrome,
+  Eye,
+  EyeOff,
+  Heart,
+  Lock,
+  Mail,
+  User,
+  X,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { signUpWithEmail, signInWithGoogle } from '@/lib/auth'
-import { useAuthContext } from '@/lib/contexts/AuthContext'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { signInWithGoogle, signUpWithEmail } from '@/lib/auth';
+import { useAuthContext } from '@/lib/contexts/AuthContext';
 
 interface PasswordStrength {
-  score: number
-  label: string
-  color: string
+  score: number;
+  label: string;
+  color: string;
   requirements: {
-    length: boolean
-    lowercase: boolean
-    uppercase: boolean
-    number: boolean
-    special: boolean
-  }
+    length: boolean;
+    lowercase: boolean;
+    uppercase: boolean;
+    number: boolean;
+    special: boolean;
+  };
 }
 
 export default function SignUpPage() {
-  const { user, loading: authLoading, redirectAfterAuth } = useAuthContext()
+  const { user, loading: authLoading, redirectAfterAuth } = useAuthContext();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
     score: 0,
     label: '',
@@ -48,51 +58,51 @@ export default function SignUpPage() {
       number: false,
       special: false,
     },
-  })
+  });
 
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
       // Use the new redirectAfterAuth function which handles onboarding status
-      redirectAfterAuth()
-      return
+      redirectAfterAuth();
+      return;
     }
-  }, [user, authLoading, redirectAfterAuth])
+  }, [user, authLoading, redirectAfterAuth]);
 
   // Calculate password strength
   useEffect(() => {
-    const password = formData.password
+    const password = formData.password;
     const requirements = {
       length: password.length >= 8,
       lowercase: /[a-z]/.test(password),
       uppercase: /[A-Z]/.test(password),
       number: /\d/.test(password),
       special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    }
+    };
 
-    const score = Object.values(requirements).filter(Boolean).length
-    let label = ''
-    let color = ''
+    const score = Object.values(requirements).filter(Boolean).length;
+    let label = '';
+    let color = '';
 
     if (score === 0) {
-      label = ''
-      color = ''
+      label = '';
+      color = '';
     } else if (score <= 2) {
-      label = 'Fraca'
-      color = 'text-red-600'
+      label = 'Fraca';
+      color = 'text-red-600';
     } else if (score <= 3) {
-      label = 'Média'
-      color = 'text-yellow-600'
+      label = 'Média';
+      color = 'text-yellow-600';
     } else if (score <= 4) {
-      label = 'Boa'
-      color = 'text-blue-600'
+      label = 'Boa';
+      color = 'text-blue-600';
     } else {
-      label = 'Forte'
-      color = 'text-green-600'
+      label = 'Forte';
+      color = 'text-green-600';
     }
 
-    setPasswordStrength({ score, label, color, requirements })
-  }, [formData.password])
+    setPasswordStrength({ score, label, color, requirements });
+  }, [formData.password]);
 
   // Show loading state while checking authentication
   if (authLoading) {
@@ -105,89 +115,93 @@ export default function SignUpPage() {
           <div className="animate-spin w-6 h-6 border-2 border-jona-green-600 border-t-transparent rounded-full mx-auto"></div>
         </div>
       </div>
-    )
+    );
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value,
-    }))
+    }));
     // Clear error when user starts typing
-    if (error) setError(null)
-  }
+    if (error) setError(null);
+  };
 
   const validateForm = () => {
     if (!formData.name.trim()) {
-      setError('Por favor, digite seu nome.')
-      return false
+      setError('Por favor, digite seu nome.');
+      return false;
     }
 
     if (!formData.email.trim()) {
-      setError('Por favor, digite seu email.')
-      return false
+      setError('Por favor, digite seu email.');
+      return false;
     }
 
     if (!formData.password) {
-      setError('Por favor, digite uma senha.')
-      return false
+      setError('Por favor, digite uma senha.');
+      return false;
     }
 
     if (formData.password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres.')
-      return false
+      setError('A senha deve ter pelo menos 6 caracteres.');
+      return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('As senhas não coincidem.')
-      return false
+      setError('As senhas não coincidem.');
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       await signUpWithEmail({
         email: formData.email,
         password: formData.password,
         name: formData.name,
-      })
-      console.log('✅ Email sign-up successful, calling redirectAfterAuth')
+      });
+      console.log('✅ Email sign-up successful, calling redirectAfterAuth');
       // Give a small delay to ensure auth state is updated
       setTimeout(() => {
-        redirectAfterAuth()
-      }, 100)
+        redirectAfterAuth();
+      }, 100);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Erro ao criar conta')
-      setIsLoading(false)
+      setError(error instanceof Error ? error.message : 'Erro ao criar conta');
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleSignUp = async () => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      await signInWithGoogle()
-      console.log('✅ Google sign-up successful, calling redirectAfterAuth')
+      await signInWithGoogle();
+      console.log('✅ Google sign-up successful, calling redirectAfterAuth');
       // Give a small delay to ensure auth state is updated
       setTimeout(() => {
-        redirectAfterAuth()
-      }, 100)
+        redirectAfterAuth();
+      }, 100);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Erro ao criar conta com Google')
-      setIsLoading(false)
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Erro ao criar conta com Google'
+      );
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50">
@@ -214,7 +228,9 @@ export default function SignUpPage() {
         >
           <Card className="shadow-lg border-0">
             <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl text-jona-green-700 mb-2">Criar Conta</CardTitle>
+              <CardTitle className="text-2xl text-jona-green-700 mb-2">
+                Criar Conta
+              </CardTitle>
               <p className="text-muted-foreground text-sm">
                 Junte-se ao JonA e comece sua jornada de conexões autênticas
               </p>
@@ -239,7 +255,10 @@ export default function SignUpPage() {
               {/* Sign Up Form */}
               <form onSubmit={handleEmailSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="name"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Nome Completo
                   </label>
                   <div className="relative">
@@ -259,7 +278,10 @@ export default function SignUpPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Email
                   </label>
                   <div className="relative">
@@ -279,7 +301,10 @@ export default function SignUpPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="password"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Senha
                   </label>
                   <div className="relative">
@@ -301,7 +326,11 @@ export default function SignUpPage() {
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       disabled={isLoading}
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
 
@@ -313,8 +342,12 @@ export default function SignUpPage() {
                       className="space-y-2"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-600">Força da senha:</span>
-                        <span className={`text-xs font-medium ${passwordStrength.color}`}>
+                        <span className="text-xs text-gray-600">
+                          Força da senha:
+                        </span>
+                        <span
+                          className={`text-xs font-medium ${passwordStrength.color}`}
+                        >
                           {passwordStrength.label}
                         </span>
                       </div>
@@ -324,12 +357,14 @@ export default function SignUpPage() {
                             passwordStrength.score <= 2
                               ? 'bg-red-500'
                               : passwordStrength.score <= 3
-                              ? 'bg-yellow-500'
-                              : passwordStrength.score <= 4
-                              ? 'bg-blue-500'
-                              : 'bg-green-500'
+                                ? 'bg-yellow-500'
+                                : passwordStrength.score <= 4
+                                  ? 'bg-blue-500'
+                                  : 'bg-green-500'
                           }`}
-                          style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                          style={{
+                            width: `${(passwordStrength.score / 5) * 100}%`,
+                          }}
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-1 text-xs">
@@ -403,7 +438,10 @@ export default function SignUpPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Confirmar Senha
                   </label>
                   <div className="relative">
@@ -421,7 +459,9 @@ export default function SignUpPage() {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       disabled={isLoading}
                     >
@@ -432,12 +472,13 @@ export default function SignUpPage() {
                       )}
                     </button>
                   </div>
-                  {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                    <p className="text-xs text-red-600 flex items-center space-x-1">
-                      <X className="w-3 h-3" />
-                      <span>As senhas não coincidem</span>
-                    </p>
-                  )}
+                  {formData.confirmPassword &&
+                    formData.password !== formData.confirmPassword && (
+                      <p className="text-xs text-red-600 flex items-center space-x-1">
+                        <X className="w-3 h-3" />
+                        <span>As senhas não coincidem</span>
+                      </p>
+                    )}
                 </div>
 
                 <Button
@@ -481,11 +522,17 @@ export default function SignUpPage() {
               {/* Terms */}
               <p className="text-xs text-muted-foreground text-center leading-relaxed">
                 Ao criar uma conta, você concorda com nossos{' '}
-                <Link href="/terms" className="text-jona-green-600 hover:underline">
+                <Link
+                  href="/terms"
+                  className="text-jona-green-600 hover:underline"
+                >
                   Termos de Serviço
                 </Link>{' '}
                 e{' '}
-                <Link href="/privacy" className="text-jona-green-600 hover:underline">
+                <Link
+                  href="/privacy"
+                  className="text-jona-green-600 hover:underline"
+                >
                   Política de Privacidade
                 </Link>
                 .
@@ -508,5 +555,5 @@ export default function SignUpPage() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

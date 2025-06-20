@@ -1,25 +1,24 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
-  Heart,
   Calendar,
-  BookOpen,
-  Users,
-  Settings,
-  MessageCircle,
-  Sparkles,
+  Heart,
   MapPin,
-} from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+  MessageCircle,
+  Settings,
+  Sparkles,
+  Users,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { AuthGuard } from '@/components/auth/AuthGuard'
-import BottomNavigation from '@/components/BottomNavigation'
-import EmotionalAlert from '@/components/EmotionalAlert'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AuthGuard } from '@/components/auth/AuthGuard';
+import BottomNavigation from '@/components/BottomNavigation';
+import EmotionalAlert from '@/components/EmotionalAlert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Mock data for connections
 const mockConnections = [
@@ -50,24 +49,24 @@ const mockConnections = [
     lastActive: new Date('2024-01-15T08:45:00'),
     location: 'Belo Horizonte, MG',
   },
-]
+];
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const [showEmotionalAlert, setShowEmotionalAlert] = useState(true)
+  const router = useRouter();
+  const [showEmotionalAlert, setShowEmotionalAlert] = useState(true);
 
   const handleConnect = (connectionId: string) => {
-    console.log('Connecting with:', connectionId)
+    console.log('Connecting with:', connectionId);
     // In a real app, this would send a connection request
-  }
+  };
 
   const handleDismissAlert = () => {
-    setShowEmotionalAlert(false)
-  }
+    setShowEmotionalAlert(false);
+  };
 
   const handleSettingsClick = () => {
-    router.push('/profile')
-  }
+    router.push('/profile');
+  };
 
   return (
     <AuthGuard requireOnboarding={true}>
@@ -77,7 +76,9 @@ export default function DashboardPage() {
           <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold jona-text-gradient">JonA</h1>
-              <p className="text-sm text-muted-foreground">Suas conexões aguardam</p>
+              <p className="text-sm text-muted-foreground">
+                Suas conexões aguardam
+              </p>
             </div>
             <Button
               variant="ghost"
@@ -92,7 +93,9 @@ export default function DashboardPage() {
 
         <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
           {/* Emotional Alert */}
-          {showEmotionalAlert && <EmotionalAlert onDismiss={handleDismissAlert} />}
+          {showEmotionalAlert && (
+            <EmotionalAlert onDismiss={handleDismissAlert} />
+          )}
 
           {/* Welcome Section */}
           <motion.div
@@ -105,8 +108,12 @@ export default function DashboardPage() {
                 <div className="flex items-center space-x-3">
                   <Sparkles className="w-8 h-8" />
                   <div>
-                    <h2 className="text-xl font-semibold">Bem-vindo de volta!</h2>
-                    <p className="text-white/90">Encontramos novas pessoas compatíveis com você</p>
+                    <h2 className="text-xl font-semibold">
+                      Bem-vindo de volta!
+                    </h2>
+                    <p className="text-white/90">
+                      Encontramos novas pessoas compatíveis com você
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -160,14 +167,16 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {connection.commonInterests.slice(0, 2).map(interest => (
-                            <span
-                              key={interest}
-                              className="px-2 py-1 bg-jona-green-50 text-jona-green-700 text-xs rounded-full"
-                            >
-                              {interest}
-                            </span>
-                          ))}
+                          {connection.commonInterests
+                            .slice(0, 2)
+                            .map(interest => (
+                              <span
+                                key={interest}
+                                className="px-2 py-1 bg-jona-green-50 text-jona-green-700 text-xs rounded-full"
+                              >
+                                {interest}
+                              </span>
+                            ))}
                           {connection.commonInterests.length > 2 && (
                             <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                               +{connection.commonInterests.length - 2}
@@ -204,7 +213,9 @@ export default function DashboardPage() {
               <CardContent className="p-4 text-center">
                 <Calendar className="w-8 h-8 mx-auto mb-2 text-jona-blue-600" />
                 <h3 className="font-semibold text-sm">Próximos Eventos</h3>
-                <p className="text-xs text-muted-foreground">3 eventos esta semana</p>
+                <p className="text-xs text-muted-foreground">
+                  3 eventos esta semana
+                </p>
               </CardContent>
             </Card>
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
@@ -220,5 +231,5 @@ export default function DashboardPage() {
         <BottomNavigation currentPage="connections" />
       </div>
     </AuthGuard>
-  )
+  );
 }

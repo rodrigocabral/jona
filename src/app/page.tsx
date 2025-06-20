@@ -1,30 +1,30 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { Heart, Users, Shield, Sparkles } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion';
+import { Heart, Shield, Sparkles, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import LGPDModal from '@/components/LGPDModal'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { useAuthContext } from '@/lib/contexts/AuthContext'
+import LGPDModal from '@/components/LGPDModal';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useAuthContext } from '@/lib/contexts/AuthContext';
 
 export default function WelcomePage() {
-  const [showLGPD, setShowLGPD] = useState(false)
-  const router = useRouter()
-  const { user, loading, onboardingCompleted } = useAuthContext()
+  const [showLGPD, setShowLGPD] = useState(false);
+  const router = useRouter();
+  const { user, loading, onboardingCompleted } = useAuthContext();
 
   // Redirect authenticated users to appropriate page
   useEffect(() => {
     if (!loading && user) {
       if (onboardingCompleted) {
-        router.push('/dashboard')
+        router.push('/dashboard');
       } else {
-        router.push('/onboarding')
+        router.push('/onboarding');
       }
     }
-  }, [user, loading, onboardingCompleted, router])
+  }, [user, loading, onboardingCompleted, router]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -42,27 +42,27 @@ export default function WelcomePage() {
           <div className="animate-spin w-6 h-6 border-2 border-white border-t-transparent rounded-full mx-auto"></div>
         </motion.div>
       </div>
-    )
+    );
   }
 
   // Don't show welcome page to authenticated users
   if (user) {
-    return null
+    return null;
   }
 
   const handleStart = () => {
-    setShowLGPD(true)
-  }
+    setShowLGPD(true);
+  };
 
   const handleLGPDAccept = () => {
-    setShowLGPD(false)
-    router.push('/signup')
-  }
+    setShowLGPD(false);
+    router.push('/signup');
+  };
 
   const handleLGPDDecline = () => {
-    setShowLGPD(false)
+    setShowLGPD(false);
     // In a real app, you might redirect to an external page or show alternative options
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 jona-gradient">
@@ -84,7 +84,9 @@ export default function WelcomePage() {
               <div className="w-20 h-20 mx-auto mb-4 rounded-full jona-gradient flex items-center justify-center">
                 <Heart className="w-10 h-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-jona-green-700 mb-2">Bem-vindo ao JonA</h1>
+              <h1 className="text-3xl font-bold text-jona-green-700 mb-2">
+                Bem-vindo ao JonA
+              </h1>
               <p className="text-lg text-jona-blue-600 leading-relaxed">
                 Conecte-se de verdade com quem compartilha seus valores.
               </p>
@@ -105,7 +107,9 @@ export default function WelcomePage() {
               </div>
               <div className="flex items-center space-x-3 text-left">
                 <Shield className="w-5 h-5 text-jona-blue-600 flex-shrink-0" />
-                <span className="text-sm text-gray-600">Ambiente seguro e moderado</span>
+                <span className="text-sm text-gray-600">
+                  Ambiente seguro e moderado
+                </span>
               </div>
               <div className="flex items-center space-x-3 text-left">
                 <Sparkles className="w-5 h-5 text-jona-green-600 flex-shrink-0" />
@@ -134,7 +138,11 @@ export default function WelcomePage() {
         </Card>
       </motion.div>
 
-      <LGPDModal isOpen={showLGPD} onAccept={handleLGPDAccept} onDecline={handleLGPDDecline} />
+      <LGPDModal
+        isOpen={showLGPD}
+        onAccept={handleLGPDAccept}
+        onDecline={handleLGPDDecline}
+      />
     </div>
-  )
+  );
 }

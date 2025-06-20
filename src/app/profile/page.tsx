@@ -1,67 +1,64 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
   ArrowLeft,
-  User,
-  Mail,
-  Settings,
   Bell,
-  Shield,
-  LogOut,
+  Calendar,
   Edit3,
   Instagram,
-  Heart,
+  LogOut,
+  Mail,
   MapPin,
-  Calendar,
-  Users,
-} from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+  Settings,
+  Shield,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import { Switch } from '@/components/ui/switch'
-import { useAuthContext } from '@/lib/contexts/AuthContext'
+} from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
+import { useAuthContext } from '@/lib/contexts/AuthContext';
 
 export default function ProfilePage() {
-  const router = useRouter()
-  const { user, signOut } = useAuthContext()
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [notifications, setNotifications] = useState(true)
-  const [privateProfile, setPrivateProfile] = useState(false)
+  const router = useRouter();
+  const { user, signOut } = useAuthContext();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+  const [privateProfile, setPrivateProfile] = useState(false);
 
   const handleBack = () => {
-    router.back()
-  }
+    router.back();
+  };
 
   const handleLogout = async () => {
     try {
-      setIsLoggingOut(true)
-      await signOut()
-      router.replace('/login')
+      setIsLoggingOut(true);
+      await signOut();
+      router.replace('/login');
     } catch (error) {
-      console.error('Logout error:', error)
+      console.error('Logout error:', error);
     } finally {
-      setIsLoggingOut(false)
-      setShowLogoutDialog(false)
+      setIsLoggingOut(false);
+      setShowLogoutDialog(false);
     }
-  }
+  };
 
   const handleEditProfile = () => {
     // Navigate to edit profile page or open edit modal
-    console.log('Edit profile clicked')
-  }
+    console.log('Edit profile clicked');
+  };
 
   // Mock user data - in a real app, this would come from the database
   const userProfile = {
@@ -74,19 +71,26 @@ export default function ProfilePage() {
     communities: 3,
     interests: ['Yoga', 'Sustentabilidade', 'Leitura', 'Tecnologia', 'Viagens'],
     instagramConnected: false,
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center space-x-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} aria-label="Voltar">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleBack}
+            aria-label="Voltar"
+          >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
             <h1 className="text-xl font-semibold">Perfil</h1>
-            <p className="text-sm text-muted-foreground">Gerencie suas informações</p>
+            <p className="text-sm text-muted-foreground">
+              Gerencie suas informações
+            </p>
           </div>
         </div>
       </div>
@@ -239,10 +243,14 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <Button
-                  variant={userProfile.instagramConnected ? 'outline' : 'default'}
+                  variant={
+                    userProfile.instagramConnected ? 'outline' : 'default'
+                  }
                   size="sm"
                   aria-label={
-                    userProfile.instagramConnected ? 'Desconectar Instagram' : 'Conectar Instagram'
+                    userProfile.instagramConnected
+                      ? 'Desconectar Instagram'
+                      : 'Conectar Instagram'
                   }
                 >
                   {userProfile.instagramConnected ? 'Desconectar' : 'Conectar'}
@@ -280,8 +288,8 @@ export default function ProfilePage() {
           <DialogHeader>
             <DialogTitle>Confirmar Saída</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja sair da sua conta? Você precisará fazer login novamente para
-              acessar o JonA.
+              Tem certeza que deseja sair da sua conta? Você precisará fazer
+              login novamente para acessar o JonA.
             </DialogDescription>
           </DialogHeader>
           <div className="flex space-x-3 mt-6">
@@ -315,5 +323,5 @@ export default function ProfilePage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
