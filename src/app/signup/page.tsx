@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Heart, Mail, Lock, Eye, EyeOff, AlertCircle, User, Chrome, Check, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth } from '@/lib/hooks/useAuth'
+import { useAuthContext } from '@/lib/contexts/AuthContext'
 import { signUpWithEmail, signInWithGoogle } from '@/lib/auth'
 
 interface PasswordStrength {
@@ -25,13 +25,12 @@ interface PasswordStrength {
 }
 
 export default function SignUpPage() {
-  const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, redirectAfterAuth } = useAuthContext()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -46,16 +45,18 @@ export default function SignUpPage() {
       lowercase: false,
       uppercase: false,
       number: false,
-      special: false
-    }
+      special: false,
+    },
   })
 
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
-      router.push('/dashboard')
+      // Use the new redirectAfterAuth function which handles onboarding status
+      redirectAfterAuth()
+      return
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, redirectAfterAuth])
 
   // Calculate password strength
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function SignUpPage() {
       lowercase: /[a-z]/.test(password),
       uppercase: /[A-Z]/.test(password),
       number: /\d/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
     }
 
     const score = Object.values(requirements).filter(Boolean).length
@@ -110,7 +111,7 @@ export default function SignUpPage() {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
     // Clear error when user starts typing
     if (error) setError(null)
@@ -147,7 +148,7 @@ export default function SignUpPage() {
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
 
     setIsLoading(true)
@@ -157,12 +158,15 @@ export default function SignUpPage() {
       await signUpWithEmail({
         email: formData.email,
         password: formData.password,
-        name: formData.name
+        name: formData.name,
       })
-      // Router will handle redirect via useEffect
+      console.log('✅ Email sign-up successful, calling redirectAfterAuth')
+      // Give a small delay to ensure auth state is updated
+      setTimeout(() => {
+        redirectAfterAuth()
+      }, 100)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao criar conta')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -173,10 +177,13 @@ export default function SignUpPage() {
 
     try {
       await signInWithGoogle()
-      // Router will handle redirect via useEffect
+      console.log('✅ Google sign-up successful, calling redirectAfterAuth')
+      // Give a small delay to ensure auth state is updated
+      setTimeout(() => {
+        redirectAfterAuth()
+      }, 100)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao criar conta com Google')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -206,14 +213,12 @@ export default function SignUpPage() {
         >
           <Card className="shadow-lg border-0">
             <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl text-jona-green-700 mb-2">
-                Criar Conta
-              </CardTitle>
+              <CardTitle className="text-2xl text-jona-green-700 mb-2">Criar Conta</CardTitle>
               <p className="text-muted-foreground text-sm">
                 Junte-se ao JonA e comece sua jornada de conexões autênticas
               </p>
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
               {/* Error Display */}
               <AnimatePresence>
@@ -315,47 +320,79 @@ export default function SignUpPage() {
                       <div className="w-full bg-gray-200 rounded-full h-1">
                         <div
                           className={`h-1 rounded-full transition-all duration-300 ${
-                            passwordStrength.score <= 2 ? 'bg-red-500' :
-                            passwordStrength.score <= 3 ? 'bg-yellow-500' :
-                            passwordStrength.score <= 4 ? 'bg-blue-500' : 'bg-green-500'
+                            passwordStrength.score <= 2
+                              ? 'bg-red-500'
+                              : passwordStrength.score <= 3
+                              ? 'bg-yellow-500'
+                              : passwordStrength.score <= 4
+                              ? 'bg-blue-500'
+                              : 'bg-green-500'
                           }`}
                           style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-1 text-xs">
                         <div className="flex items-center space-x-1">
-                          {passwordStrength.requirements.length ? 
-                            <Check className="w-3 h-3 text-green-600" /> : 
+                          {passwordStrength.requirements.length ? (
+                            <Check className="w-3 h-3 text-green-600" />
+                          ) : (
                             <X className="w-3 h-3 text-gray-400" />
-                          }
-                          <span className={passwordStrength.requirements.length ? 'text-green-600' : 'text-gray-400'}>
+                          )}
+                          <span
+                            className={
+                              passwordStrength.requirements.length
+                                ? 'text-green-600'
+                                : 'text-gray-400'
+                            }
+                          >
                             8+ caracteres
                           </span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          {passwordStrength.requirements.number ? 
-                            <Check className="w-3 h-3 text-green-600" /> : 
+                          {passwordStrength.requirements.number ? (
+                            <Check className="w-3 h-3 text-green-600" />
+                          ) : (
                             <X className="w-3 h-3 text-gray-400" />
-                          }
-                          <span className={passwordStrength.requirements.number ? 'text-green-600' : 'text-gray-400'}>
+                          )}
+                          <span
+                            className={
+                              passwordStrength.requirements.number
+                                ? 'text-green-600'
+                                : 'text-gray-400'
+                            }
+                          >
                             Número
                           </span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          {passwordStrength.requirements.lowercase ? 
-                            <Check className="w-3 h-3 text-green-600" /> : 
+                          {passwordStrength.requirements.lowercase ? (
+                            <Check className="w-3 h-3 text-green-600" />
+                          ) : (
                             <X className="w-3 h-3 text-gray-400" />
-                          }
-                          <span className={passwordStrength.requirements.lowercase ? 'text-green-600' : 'text-gray-400'}>
+                          )}
+                          <span
+                            className={
+                              passwordStrength.requirements.lowercase
+                                ? 'text-green-600'
+                                : 'text-gray-400'
+                            }
+                          >
                             Minúscula
                           </span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          {passwordStrength.requirements.uppercase ? 
-                            <Check className="w-3 h-3 text-green-600" /> : 
+                          {passwordStrength.requirements.uppercase ? (
+                            <Check className="w-3 h-3 text-green-600" />
+                          ) : (
                             <X className="w-3 h-3 text-gray-400" />
-                          }
-                          <span className={passwordStrength.requirements.uppercase ? 'text-green-600' : 'text-gray-400'}>
+                          )}
+                          <span
+                            className={
+                              passwordStrength.requirements.uppercase
+                                ? 'text-green-600'
+                                : 'text-gray-400'
+                            }
+                          >
                             Maiúscula
                           </span>
                         </div>
@@ -387,7 +424,11 @@ export default function SignUpPage() {
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       disabled={isLoading}
                     >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                   {formData.confirmPassword && formData.password !== formData.confirmPassword && (
@@ -453,8 +494,8 @@ export default function SignUpPage() {
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
                   Já tem uma conta?{' '}
-                  <Link 
-                    href="/login" 
+                  <Link
+                    href="/login"
                     className="text-jona-green-600 hover:text-jona-green-700 hover:underline font-medium"
                   >
                     Entrar
@@ -467,4 +508,4 @@ export default function SignUpPage() {
       </div>
     </div>
   )
-} 
+}

@@ -1,23 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Heart, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Chrome } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth } from '@/lib/hooks/useAuth'
+import { useAuthContext } from '@/lib/contexts/AuthContext'
 import { signInWithEmail, signInWithGoogle, resetPassword } from '@/lib/auth'
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, redirectAfterAuth } = useAuthContext()
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -30,9 +29,11 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
-      router.push('/dashboard')
+      // Use the new redirectAfterAuth function which handles onboarding status
+      redirectAfterAuth()
+      return
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, redirectAfterAuth])
 
   // Show loading state while checking authentication
   if (authLoading) {
@@ -52,7 +53,7 @@ export default function LoginPage() {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
     // Clear error when user starts typing
     if (error) setError(null)
@@ -60,7 +61,7 @@ export default function LoginPage() {
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.email || !formData.password) {
       setError('Por favor, preencha todos os campos.')
       return
@@ -72,12 +73,15 @@ export default function LoginPage() {
     try {
       await signInWithEmail({
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       })
-      // Router will handle redirect via useEffect
+      console.log('✅ Email sign-in successful, calling redirectAfterAuth')
+      // Give a small delay to ensure auth state is updated
+      setTimeout(() => {
+        redirectAfterAuth()
+      }, 100)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao fazer login')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -88,10 +92,13 @@ export default function LoginPage() {
 
     try {
       await signInWithGoogle()
-      // Router will handle redirect via useEffect
+      console.log('✅ Google sign-in successful, calling redirectAfterAuth')
+      // Give a small delay to ensure auth state is updated
+      setTimeout(() => {
+        redirectAfterAuth()
+      }, 100)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro ao fazer login com Google')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -147,14 +154,12 @@ export default function LoginPage() {
         >
           <Card className="shadow-lg border-0">
             <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl text-jona-green-700 mb-2">
-                Entrar
-              </CardTitle>
+              <CardTitle className="text-2xl text-jona-green-700 mb-2">Entrar</CardTitle>
               <p className="text-muted-foreground text-sm">
                 Entre na sua conta para continuar sua jornada
               </p>
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
               {/* Error Display */}
               <AnimatePresence>
@@ -274,8 +279,8 @@ export default function LoginPage() {
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
                   Não tem uma conta?{' '}
-                  <Link 
-                    href="/signup" 
+                  <Link
+                    href="/signup"
                     className="text-jona-green-600 hover:text-jona-green-700 hover:underline font-medium"
                   >
                     Criar conta
@@ -293,7 +298,7 @@ export default function LoginPage() {
           <DialogHeader>
             <DialogTitle>Recuperar Senha</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             {resetSuccess ? (
               <motion.div
@@ -304,8 +309,8 @@ export default function LoginPage() {
                 <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Email Enviado!</h3>
                 <p className="text-muted-foreground text-sm">
-                  Enviamos um link de recuperação para <strong>{resetEmail}</strong>. 
-                  Verifique sua caixa de entrada.
+                  Enviamos um link de recuperação para <strong>{resetEmail}</strong>. Verifique sua
+                  caixa de entrada.
                 </p>
               </motion.div>
             ) : (
@@ -313,7 +318,7 @@ export default function LoginPage() {
                 <p className="text-muted-foreground text-sm">
                   Digite seu email para receber um link de recuperação de senha.
                 </p>
-                
+
                 <div className="space-y-2">
                   <label htmlFor="reset-email" className="text-sm font-medium">
                     Email
@@ -323,7 +328,7 @@ export default function LoginPage() {
                     type="email"
                     placeholder="seu@email.com"
                     value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
+                    onChange={e => setResetEmail(e.target.value)}
                     disabled={resetLoading}
                   />
                 </div>
@@ -366,4 +371,4 @@ export default function LoginPage() {
       </Dialog>
     </div>
   )
-} 
+}

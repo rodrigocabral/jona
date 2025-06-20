@@ -11,28 +11,24 @@ interface AuthGuardProps {
   requireOnboarding?: boolean
 }
 
-export function AuthGuard({ 
-  children, 
+export function AuthGuard({
+  children,
   redirectTo = '/login',
-  requireOnboarding = false 
+  requireOnboarding = false,
 }: AuthGuardProps) {
   const router = useRouter()
-  const { user, loading } = useAuthContext()
+  const { user, loading, onboardingCompleted } = useAuthContext()
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         router.push(redirectTo)
-      } else if (requireOnboarding) {
-        // Check if user has completed onboarding
-        // This would require fetching user profile from Firestore
-        // For now, we'll assume onboarding is required if user doesn't have displayName
-        if (!user.displayName) {
-          router.push('/onboarding')
-        }
+      } else if (requireOnboarding && onboardingCompleted === false) {
+        // User is authenticated but hasn't completed onboarding
+        router.push('/onboarding')
       }
     }
-  }, [user, loading, router, redirectTo, requireOnboarding])
+  }, [user, loading, onboardingCompleted, router, redirectTo, requireOnboarding])
 
   // Show loading state while checking authentication
   if (loading) {
@@ -54,5 +50,10 @@ export function AuthGuard({
     return null
   }
 
+  // Don't render children if onboarding is required but not completed
+  if (requireOnboarding && onboardingCompleted === false) {
+    return null
+  }
+
   return <>{children}</>
-} 
+}
