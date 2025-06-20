@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuthContext } from '@/lib/contexts/AuthContext'
 import { Heart } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, ReactNode } from 'react'
+
+import { useAuthContext } from '@/lib/contexts/AuthContext'
+
 
 interface AuthGuardProps {
   children: ReactNode

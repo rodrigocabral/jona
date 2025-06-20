@@ -1,9 +1,10 @@
 'use client'
 
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Heart, X, Play } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Heart, X, Play } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 
 interface EmotionalAlertProps {
   onDismiss: () => void

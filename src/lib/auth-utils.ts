@@ -1,4 +1,5 @@
 import { User as FirebaseUser } from 'firebase/auth'
+
 import { auth } from './firebase'
 
 /**

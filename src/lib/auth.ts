@@ -8,6 +8,7 @@ import {
   User as FirebaseUser,
   AuthError,
 } from 'firebase/auth'
+
 import { auth } from './firebase'
 import { createOrUpdateUserProfile } from './onboarding'
 

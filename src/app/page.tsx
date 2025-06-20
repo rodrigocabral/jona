@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { Heart, Users, Shield, Sparkles } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+
+import LGPDModal from '@/components/LGPDModal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Heart, Users, Shield, Sparkles } from 'lucide-react'
-import { motion } from 'framer-motion'
-import LGPDModal from '@/components/LGPDModal'
 import { useAuthContext } from '@/lib/contexts/AuthContext'
 
 export default function WelcomePage() {

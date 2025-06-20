@@ -1,16 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Heart, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Chrome } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState, useEffect } from 'react'
+
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Heart, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Chrome } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useAuthContext } from '@/lib/contexts/AuthContext'
+import { Input } from '@/components/ui/input'
 import { signInWithEmail, signInWithGoogle, resetPassword } from '@/lib/auth'
+import { useAuthContext } from '@/lib/contexts/AuthContext'
 
 export default function LoginPage() {
   const { user, loading: authLoading, redirectAfterAuth } = useAuthContext()

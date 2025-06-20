@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Heart, Mail, Lock, Eye, EyeOff, AlertCircle, User, Chrome, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState, useEffect } from 'react'
+
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Heart, Mail, Lock, Eye, EyeOff, AlertCircle, User, Chrome, Check, X } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useAuthContext } from '@/lib/contexts/AuthContext'
 import { signUpWithEmail, signInWithGoogle } from '@/lib/auth'
+import { useAuthContext } from '@/lib/contexts/AuthContext'
 
 interface PasswordStrength {
   score: number

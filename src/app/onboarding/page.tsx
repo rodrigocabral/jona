@@ -1,12 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Progress } from '@/components/ui/progress'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { collection, doc, getDoc, getDocs, limit, query, where } from 'firebase/firestore'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronLeft,
   ChevronRight,
@@ -17,8 +12,16 @@ import {
   X,
   AlertCircle,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Progress } from '@/components/ui/progress'
+import { Textarea } from '@/components/ui/textarea'
 import { useAuthContext } from '@/lib/contexts/AuthContext'
+import { db } from '@/lib/firebase'
 import {
   saveOnboardingResponses,
   createOrUpdateUserProfile,
@@ -26,8 +29,7 @@ import {
   getOnboardingQuestions,
   Question,
 } from '@/lib/onboarding'
-import { collection, doc, getDoc, getDocs, limit, query, where } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+
 
 export default function OnboardingPage() {
   const router = useRouter()

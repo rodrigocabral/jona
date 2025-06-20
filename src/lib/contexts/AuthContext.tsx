@@ -1,11 +1,12 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User as FirebaseUser, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+
+import { syncAuthWithCookies, clearAuthCookie } from '../auth-utils'
 import { auth } from '../firebase'
 import { createOrUpdateUserProfile, getUserOnboardingStatus } from '../onboarding'
-import { syncAuthWithCookies, clearAuthCookie } from '../auth-utils'
 
 interface AuthContextType {
   user: FirebaseUser | null

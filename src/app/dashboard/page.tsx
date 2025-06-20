@@ -1,10 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { motion } from 'framer-motion'
 import {
   Heart,
   Calendar,
@@ -15,10 +11,15 @@ import {
   Sparkles,
   MapPin,
 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+import { AuthGuard } from '@/components/auth/AuthGuard'
 import BottomNavigation from '@/components/BottomNavigation'
 import EmotionalAlert from '@/components/EmotionalAlert'
-import { AuthGuard } from '@/components/auth/AuthGuard'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 // Mock data for connections
 const mockConnections = [

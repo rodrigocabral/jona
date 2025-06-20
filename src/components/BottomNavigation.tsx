@@ -1,7 +1,8 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
 import { Heart, Calendar, BookOpen, Users } from 'lucide-react'
+import { useRouter, usePathname } from 'next/navigation'
+
 import { cn } from '@/lib/utils'
 
 interface BottomNavigationProps {

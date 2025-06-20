@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { BookOpen, Mic, MicOff, Play, Pause, Save, Lightbulb } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { BookOpen, Mic, MicOff, Play, Pause, Save, Lightbulb } from 'lucide-react'
+import { useState, useRef } from 'react'
+
 import BottomNavigation from '@/components/BottomNavigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Textarea } from '@/components/ui/textarea'
 
 type Emotion = 'happy' | 'sad' | 'neutral' | 'excited' | 'anxious' | 'calm'
 

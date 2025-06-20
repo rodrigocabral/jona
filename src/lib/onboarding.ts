@@ -11,8 +11,10 @@ import {
   orderBy,
   where,
 } from 'firebase/firestore'
-import { auth, db } from './firebase'
+
 import { OnboardingResponse, User } from '@/types'
+
+import { auth, db } from './firebase'
 
 // Firestore collection names
 const USERS_COLLECTION = 'users'

@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Users, Plus, Search, Calendar, MapPin, Hash, Video, Settings, Clock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+
+import BottomNavigation from '@/components/BottomNavigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -13,10 +16,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Users, Plus, Search, Calendar, MapPin, Hash, Video, Settings, Clock } from 'lucide-react'
-import { motion } from 'framer-motion'
-import BottomNavigation from '@/components/BottomNavigation'
 
 // Mock data for communities
 const mockCommunities = [
