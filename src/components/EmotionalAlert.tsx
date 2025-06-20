@@ -1,19 +1,20 @@
-'use client'
+'use client';
 
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Heart, X, Play } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
+import { Heart, Play, X } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface EmotionalAlertProps {
-  onDismiss: () => void
+  onDismiss: () => void;
 }
 
 export default function EmotionalAlert({ onDismiss }: EmotionalAlertProps) {
   const handleJoinLive = () => {
-    console.log('Joining live session...')
+    console.log('Joining live session...');
     // In a real app, this would navigate to a live session
-  }
+  };
 
   return (
     <motion.div
@@ -37,10 +38,13 @@ export default function EmotionalAlert({ onDismiss }: EmotionalAlertProps) {
               <Heart className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold mb-1">Como você está se sentindo hoje?</h3>
+              <h3 className="font-semibold mb-1">
+                Como você está se sentindo hoje?
+              </h3>
               <p className="text-sm text-white/90 mb-3">
-                Detectamos que você pode estar passando por um momento desafiador. 
-                Que tal participar de uma live sobre bem-estar emocional?
+                Detectamos que você pode estar passando por um momento
+                desafiador. Que tal participar de uma live sobre bem-estar
+                emocional?
               </p>
               <Button
                 onClick={handleJoinLive}
@@ -56,5 +60,5 @@ export default function EmotionalAlert({ onDismiss }: EmotionalAlertProps) {
         </CardContent>
       </Card>
     </motion.div>
-  )
-} 
+  );
+}

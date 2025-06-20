@@ -1,34 +1,72 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Heart, Users, Shield, Sparkles } from 'lucide-react'
-import { motion } from 'framer-motion'
-import LGPDModal from '@/components/LGPDModal'
+import { motion } from 'framer-motion';
+import { Heart, Shield, Sparkles, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import LGPDModal from '@/components/LGPDModal';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useAuthContext } from '@/lib/contexts/AuthContext';
 
 export default function WelcomePage() {
-  const [showLGPD, setShowLGPD] = useState(false)
-  const router = useRouter()
+  const [showLGPD, setShowLGPD] = useState(false);
+  const router = useRouter();
+  const { user, loading, onboardingCompleted } = useAuthContext();
+
+  // Redirect authenticated users to appropriate page
+  useEffect(() => {
+    if (!loading && user) {
+      if (onboardingCompleted) {
+        router.push('/dashboard');
+      } else {
+        router.push('/onboarding');
+      }
+    }
+  }, [user, loading, onboardingCompleted, router]);
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 jona-gradient">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
+            <Heart className="w-6 h-6 text-white" />
+          </div>
+          <div className="animate-spin w-6 h-6 border-2 border-white border-t-transparent rounded-full mx-auto"></div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Don't show welcome page to authenticated users
+  if (user) {
+    return null;
+  }
 
   const handleStart = () => {
-    setShowLGPD(true)
-  }
+    setShowLGPD(true);
+  };
 
   const handleLGPDAccept = () => {
-    setShowLGPD(false)
-    router.push('/onboarding')
-  }
+    setShowLGPD(false);
+    router.push('/signup');
+  };
 
   const handleLGPDDecline = () => {
-    setShowLGPD(false)
+    setShowLGPD(false);
     // In a real app, you might redirect to an external page or show alternative options
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 jona-gradient">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -37,7 +75,7 @@ export default function WelcomePage() {
         <Card className="backdrop-blur-sm bg-white/90 shadow-xl border-0">
           <CardContent className="p-8 text-center">
             {/* Logo */}
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
@@ -55,7 +93,7 @@ export default function WelcomePage() {
             </motion.div>
 
             {/* Features */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.5 }}
@@ -63,15 +101,21 @@ export default function WelcomePage() {
             >
               <div className="flex items-center space-x-3 text-left">
                 <Users className="w-5 h-5 text-jona-green-600 flex-shrink-0" />
-                <span className="text-sm text-gray-600">Conexões baseadas em valores compartilhados</span>
+                <span className="text-sm text-gray-600">
+                  Conexões baseadas em valores compartilhados
+                </span>
               </div>
               <div className="flex items-center space-x-3 text-left">
                 <Shield className="w-5 h-5 text-jona-blue-600 flex-shrink-0" />
-                <span className="text-sm text-gray-600">Ambiente seguro e moderado</span>
+                <span className="text-sm text-gray-600">
+                  Ambiente seguro e moderado
+                </span>
               </div>
               <div className="flex items-center space-x-3 text-left">
                 <Sparkles className="w-5 h-5 text-jona-green-600 flex-shrink-0" />
-                <span className="text-sm text-gray-600">Comunidades e experiências significativas</span>
+                <span className="text-sm text-gray-600">
+                  Comunidades e experiências significativas
+                </span>
               </div>
             </motion.div>
 
@@ -81,9 +125,9 @@ export default function WelcomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.5 }}
             >
-              <Button 
+              <Button
                 onClick={handleStart}
-                size="lg" 
+                size="lg"
                 className="w-full text-lg py-6 font-medium"
                 aria-label="Começar cadastro no JonA"
               >
@@ -94,11 +138,11 @@ export default function WelcomePage() {
         </Card>
       </motion.div>
 
-      <LGPDModal 
+      <LGPDModal
         isOpen={showLGPD}
         onAccept={handleLGPDAccept}
         onDecline={handleLGPDDecline}
       />
     </div>
-  )
-} 
+  );
+}

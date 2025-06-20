@@ -1,126 +1,247 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Progress } from '@/components/ui/progress'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ChevronLeft, ChevronRight, Instagram, Heart, Shield, Check, X } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Instagram,
+  Shield,
+  X,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-const questions = [
-  {
-    id: 1,
-    title: "O que mais te motiva no dia a dia?",
-    subtitle: "Conte sobre suas paixões, hobbies ou atividades que te fazem sentir vivo(a)."
-  },
-  {
-    id: 2,
-    title: "Como você gosta de passar seu tempo livre?",
-    subtitle: "Descreva suas atividades favoritas, lugares que gosta de frequentar ou como relaxa."
-  },
-  {
-    id: 3,
-    title: "Quais valores são mais importantes para você?",
-    subtitle: "Fale sobre princípios, crenças ou causas que guiam suas decisões e relacionamentos."
-  },
-  {
-    id: 4,
-    title: "Como você se conecta melhor com outras pessoas?",
-    subtitle: "Descreva situações, ambientes ou tipos de conversa onde você se sente mais à vontade."
-  },
-  {
-    id: 5,
-    title: "O que você busca em uma amizade verdadeira?",
-    subtitle: "Conte sobre qualidades, experiências ou momentos que considera importantes em relacionamentos."
-  },
-  {
-    id: 6,
-    title: "Como você imagina seu futuro ideal?",
-    subtitle: "Compartilhe seus sonhos, objetivos ou como gostaria que sua vida fosse daqui alguns anos."
-  }
-]
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuthContext } from '@/lib/contexts/AuthContext';
+import {
+  createOrUpdateUserProfile,
+  getOnboardingQuestions,
+  Question,
+  saveOnboardingResponses,
+  updateInstagramConnection,
+} from '@/lib/onboarding';
 
 export default function OnboardingPage() {
-  const router = useRouter()
-  const [currentQuestion, setCurrentQuestion] = useState(1)
-  const [answers, setAnswers] = useState<Record<number, string>>({})
-  const [showInstagramDialog, setShowInstagramDialog] = useState(false)
-  const [instagramConnected, setInstagramConnected] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const { user, loading: authLoading, error: authError } = useAuthContext();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionsLoading, setQuestionsLoading] = useState(true);
+  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [showInstagramDialog, setShowInstagramDialog] = useState(false);
+  const [instagramConnected, setInstagramConnected] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const progress = (currentQuestion / questions.length) * 100
-  const currentAnswer = answers[currentQuestion] || ''
-  const isLastQuestion = currentQuestion === questions.length
-  const canProceed = currentAnswer.trim().length > 0
+  // Fetch questions from Firebase on component mount
+  useEffect(() => {
+    async function fetchQuestions() {
+      try {
+        setQuestionsLoading(true);
+        console.log('📋 Fetching onboarding questions...');
+        const fetchedQuestions = await getOnboardingQuestions();
+        setQuestions(fetchedQuestions);
+        console.log(`✅ Loaded ${fetchedQuestions.length} questions`);
+      } catch (error) {
+        console.error('❌ Error loading questions:', error);
+        setError('Erro ao carregar perguntas. Tente recarregar a página.');
+      } finally {
+        setQuestionsLoading(false);
+      }
+    }
+
+    fetchQuestions();
+  }, []);
+
+  useEffect(() => {
+    console.log('📋 Onboarding page loaded for user:', user?.uid);
+  }, [user]);
+
+  // Show loading state while checking authentication or loading questions
+  if (authLoading || questionsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full jona-gradient flex items-center justify-center">
+            <Heart className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">
+            {authLoading ? 'Carregando...' : 'Carregando perguntas...'}
+          </h3>
+          <div className="animate-spin w-6 h-6 border-2 border-jona-green-600 border-t-transparent rounded-full mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if authentication failed
+  if (authError || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+          <h3 className="text-lg font-semibold mb-2">Erro de Autenticação</h3>
+          <p className="text-muted-foreground mb-4">
+            {authError || 'Usuário não autenticado'}
+          </p>
+          <Button onClick={() => router.push('/login')}>Fazer Login</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if no questions loaded
+  if (!questionsLoading && questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-orange-500" />
+          <h3 className="text-lg font-semibold mb-2">
+            Perguntas não encontradas
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            Não foi possível carregar as perguntas do onboarding.
+          </p>
+          <Button onClick={() => window.location.reload()}>
+            Tentar Novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const progress = (currentQuestion / questions.length) * 100;
+  const currentAnswer = answers[currentQuestion] || '';
+  const isLastQuestion = currentQuestion === questions.length;
+  const canProceed = currentAnswer.trim().length >= 10;
 
   const handleAnswerChange = (value: string) => {
     if (value.length <= 500) {
       setAnswers(prev => ({
         ...prev,
-        [currentQuestion]: value
-      }))
+        [currentQuestion]: value,
+      }));
     }
-  }
+  };
 
   const handleNext = () => {
     if (canProceed) {
       if (isLastQuestion) {
-        setShowInstagramDialog(true)
+        setShowInstagramDialog(true);
       } else {
-        setCurrentQuestion(prev => prev + 1)
+        setCurrentQuestion(prev => prev + 1);
       }
     }
-  }
+  };
 
   const handleBack = () => {
     if (currentQuestion > 1) {
-      setCurrentQuestion(prev => prev - 1)
+      setCurrentQuestion(prev => prev - 1);
     }
-  }
+  };
 
-  const handleInstagramConnect = () => {
-    // In a real app, this would initiate OAuth 2.0 flow with Meta Graph API
-    console.log('Connecting to Instagram...')
-    setInstagramConnected(true)
-    setShowInstagramDialog(false)
-    handleFinishOnboarding()
-  }
+  const handleInstagramConnect = async () => {
+    try {
+      // In a real app, this would initiate OAuth 2.0 flow with Meta Graph API
+      console.log('Connecting to Instagram...');
+
+      // For now, we'll simulate the connection
+      if (user) {
+        await updateInstagramConnection(user.uid, true, {
+          username: 'user_instagram', // This would come from Instagram API
+          profilePicture: user.photoURL || '',
+          followersCount: 0,
+        });
+      }
+
+      setInstagramConnected(true);
+      setShowInstagramDialog(false);
+      handleFinishOnboarding();
+    } catch (error) {
+      console.error('Error connecting Instagram:', error);
+      setError('Erro ao conectar Instagram. Tente novamente.');
+    }
+  };
 
   const handleSkipInstagram = () => {
-    setShowInstagramDialog(false)
-    handleFinishOnboarding()
-  }
+    setShowInstagramDialog(false);
+    handleFinishOnboarding();
+  };
 
   const handleFinishOnboarding = async () => {
-    setIsSubmitting(true)
-    
-    // Simulate API call to save encrypted responses
-    try {
-      console.log('Saving onboarding responses:', {
-        answers,
-        instagramConnected,
-        timestamp: new Date().toISOString()
-      })
-      
-      // In a real app, this would:
-      // 1. Encrypt responses with AES-256
-      // 2. Save to MongoDB
-      // 3. Mark user as onboarding completed
-      
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      router.push('/dashboard')
-    } catch (error) {
-      console.error('Error saving onboarding:', error)
-    } finally {
-      setIsSubmitting(false)
+    if (!user) {
+      setError('Usuário não autenticado');
+      return;
     }
-  }
 
-  const currentQuestionData = questions.find(q => q.id === currentQuestion)
+    // Validate that all questions have been answered
+    const unansweredQuestions = questions.filter(
+      q => !answers[q.id] || answers[q.id].trim().length === 0
+    );
+    if (unansweredQuestions.length > 0) {
+      setError(
+        `Por favor, responda todas as perguntas. Faltam: ${unansweredQuestions.length} pergunta(s)`
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      console.log('💾 Saving onboarding responses:', {
+        userId: user.uid,
+        totalAnswers: Object.keys(answers).length,
+        totalQuestions: questions.length,
+        answers: Object.entries(answers).map(([id, answer]) => ({
+          questionId: id,
+          questionTitle: questions.find(q => q.id === parseInt(id))?.title,
+          answerLength: answer.length,
+        })),
+        instagramConnected,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Save onboarding responses to Firebase
+      await saveOnboardingResponses({
+        userId: user.uid,
+        answers,
+        questions,
+        instagramConnected,
+      });
+
+      console.log('✅ Onboarding responses saved to Firebase');
+
+      // Update user profile to mark onboarding as completed
+      await createOrUpdateUserProfile({
+        onboardingCompleted: true,
+        instagramConnected,
+      });
+
+      console.log('✅ User profile updated - onboarding marked as completed');
+      console.log('🎉 Onboarding process completed successfully!');
+
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('❌ Error saving onboarding:', error);
+      setError('Erro ao salvar respostas. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const currentQuestionData = questions.find(q => q.id === currentQuestion);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50">
@@ -134,7 +255,9 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h1 className="text-lg font-bold jona-text-gradient">JonA</h1>
-                <p className="text-xs text-muted-foreground">Mapa de Compatibilidade</p>
+                <p className="text-xs text-muted-foreground">
+                  Mapa de Compatibilidade
+                </p>
               </div>
             </div>
             <div className="text-right">
@@ -144,7 +267,7 @@ export default function OnboardingPage() {
               <div className="text-xs text-muted-foreground">Perguntas</div>
             </div>
           </div>
-          
+
           {/* Progress Bar */}
           <div className="mt-4">
             <Progress value={progress} className="h-2" />
@@ -153,6 +276,29 @@ export default function OnboardingPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
+        {/* Error Display */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <div>
+              <p className="text-red-800 text-sm font-medium">Erro</p>
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setError(null)}
+              className="ml-auto"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </motion.div>
+        )}
+
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestion}
@@ -170,23 +316,37 @@ export default function OnboardingPage() {
                   {currentQuestionData?.subtitle}
                 </p>
               </CardHeader>
-              
+
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Textarea
                     placeholder="Compartilhe seus pensamentos aqui..."
                     value={currentAnswer}
-                    onChange={(e) => handleAnswerChange(e.target.value)}
+                    onChange={e => handleAnswerChange(e.target.value)}
                     maxLength={500}
                     rows={6}
                     className="resize-none text-base leading-relaxed"
                     aria-label={`Resposta para: ${currentQuestionData?.title}`}
                   />
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">
-                      Mínimo: 10 caracteres
+                    <span
+                      className={`${
+                        currentAnswer.trim().length >= 10
+                          ? 'text-jona-green-600'
+                          : 'text-muted-foreground'
+                      }`}
+                    >
+                      {currentAnswer.trim().length >= 10
+                        ? '✓ Resposta completa'
+                        : `Mínimo: ${currentAnswer.trim().length}/10 caracteres`}
                     </span>
-                    <span className={`${currentAnswer.length > 450 ? 'text-orange-600' : 'text-muted-foreground'}`}>
+                    <span
+                      className={`${
+                        currentAnswer.length > 450
+                          ? 'text-orange-600'
+                          : 'text-muted-foreground'
+                      }`}
+                    >
                       {currentAnswer.length}/500
                     </span>
                   </div>
@@ -203,15 +363,21 @@ export default function OnboardingPage() {
                     <ChevronLeft className="w-4 h-4 mr-2" />
                     Voltar
                   </Button>
-                  
+
                   <Button
                     onClick={handleNext}
                     disabled={!canProceed}
                     className="bg-jona-green-600 hover:bg-jona-green-700"
-                    aria-label={isLastQuestion ? "Finalizar onboarding" : "Próxima pergunta"}
+                    aria-label={
+                      isLastQuestion
+                        ? 'Finalizar onboarding'
+                        : 'Próxima pergunta'
+                    }
                   >
-                    {isLastQuestion ? "Finalizar" : "Próximo"}
-                    {!isLastQuestion && <ChevronRight className="w-4 h-4 ml-2" />}
+                    {isLastQuestion ? 'Finalizar' : 'Próximo'}
+                    {!isLastQuestion && (
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    )}
                   </Button>
                 </div>
               </CardContent>
@@ -229,28 +395,34 @@ export default function OnboardingPage() {
               <DialogTitle>Conectar Instagram</DialogTitle>
             </div>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Conecte seu Instagram para enriquecer seu perfil e receber sugestões 
-              mais precisas de conexões baseadas em seus interesses.
+              Conecte seu Instagram para enriquecer seu perfil e receber
+              sugestões mais precisas de conexões baseadas em seus interesses.
             </p>
-            
+
             <div className="space-y-3">
               <div className="flex items-start space-x-2">
                 <Shield className="w-4 h-4 text-jona-green-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Seus dados são anonimizados e criptografados</span>
+                <span className="text-sm">
+                  Seus dados são criptografados e seguros
+                </span>
               </div>
               <div className="flex items-start space-x-2">
                 <Shield className="w-4 h-4 text-jona-green-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Não publicamos nada em seu perfil</span>
+                <span className="text-sm">
+                  Não publicamos nada em seu perfil
+                </span>
               </div>
               <div className="flex items-start space-x-2">
                 <Shield className="w-4 h-4 text-jona-green-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Você pode desconectar a qualquer momento</span>
+                <span className="text-sm">
+                  Você pode desconectar a qualquer momento
+                </span>
               </div>
             </div>
-            
+
             <div className="flex space-x-3 pt-4">
               <Button
                 variant="outline"
@@ -282,15 +454,23 @@ export default function OnboardingPage() {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-lg p-8 text-center"
+            className="bg-white rounded-lg p-8 text-center max-w-md mx-4"
           >
             <div className="w-12 h-12 mx-auto mb-4 rounded-full jona-gradient flex items-center justify-center">
               <Heart className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Finalizando seu perfil...</h3>
-            <p className="text-muted-foreground text-sm">
-              Estamos preparando suas sugestões de conexão
-            </p>
+            <h3 className="text-lg font-semibold mb-2">
+              Finalizando seu perfil...
+            </h3>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p>💾 Salvando {Object.keys(answers).length} respostas</p>
+              <p>👤 Atualizando perfil do usuário</p>
+              <p>
+                {instagramConnected
+                  ? '📱 Conectando Instagram'
+                  : '⏭️ Prosseguindo sem Instagram'}
+              </p>
+            </div>
             <div className="mt-4">
               <div className="animate-spin w-6 h-6 border-2 border-jona-green-600 border-t-transparent rounded-full mx-auto"></div>
             </div>
@@ -298,5 +478,5 @@ export default function OnboardingPage() {
         </div>
       )}
     </div>
-  )
-} 
+  );
+}
