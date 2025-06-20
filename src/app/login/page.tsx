@@ -1,40 +1,53 @@
-'use client'
+'use client';
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Chrome } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  AlertCircle,
+  CheckCircle,
+  Chrome,
+  Eye,
+  EyeOff,
+  Heart,
+  Lock,
+  Mail,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { signInWithEmail, signInWithGoogle, resetPassword } from '@/lib/auth'
-import { useAuthContext } from '@/lib/contexts/AuthContext'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { resetPassword, signInWithEmail, signInWithGoogle } from '@/lib/auth';
+import { useAuthContext } from '@/lib/contexts/AuthContext';
 
 export default function LoginPage() {
-  const { user, loading: authLoading, redirectAfterAuth } = useAuthContext()
+  const { user, loading: authLoading, redirectAfterAuth } = useAuthContext();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [showResetDialog, setShowResetDialog] = useState(false)
-  const [resetEmail, setResetEmail] = useState('')
-  const [resetLoading, setResetLoading] = useState(false)
-  const [resetSuccess, setResetSuccess] = useState(false)
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
       // Use the new redirectAfterAuth function which handles onboarding status
-      redirectAfterAuth()
-      return
+      redirectAfterAuth();
+      return;
     }
-  }, [user, authLoading, redirectAfterAuth])
+  }, [user, authLoading, redirectAfterAuth]);
 
   // Show loading state while checking authentication
   if (authLoading) {
@@ -47,88 +60,96 @@ export default function LoginPage() {
           <div className="animate-spin w-6 h-6 border-2 border-jona-green-600 border-t-transparent rounded-full mx-auto"></div>
         </div>
       </div>
-    )
+    );
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value,
-    }))
+    }));
     // Clear error when user starts typing
-    if (error) setError(null)
-  }
+    if (error) setError(null);
+  };
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      setError('Por favor, preencha todos os campos.')
-      return
+      setError('Por favor, preencha todos os campos.');
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       await signInWithEmail({
         email: formData.email,
         password: formData.password,
-      })
-      console.log('✅ Email sign-in successful, calling redirectAfterAuth')
+      });
+      console.log('✅ Email sign-in successful, calling redirectAfterAuth');
       // Give a small delay to ensure auth state is updated
       setTimeout(() => {
-        redirectAfterAuth()
-      }, 100)
+        redirectAfterAuth();
+      }, 100);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Erro ao fazer login')
-      setIsLoading(false)
+      setError(error instanceof Error ? error.message : 'Erro ao fazer login');
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      await signInWithGoogle()
-      console.log('✅ Google sign-in successful, calling redirectAfterAuth')
+      await signInWithGoogle();
+      console.log('✅ Google sign-in successful, calling redirectAfterAuth');
       // Give a small delay to ensure auth state is updated
       setTimeout(() => {
-        redirectAfterAuth()
-      }, 100)
+        redirectAfterAuth();
+      }, 100);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Erro ao fazer login com Google')
-      setIsLoading(false)
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Erro ao fazer login com Google'
+      );
+      setIsLoading(false);
     }
-  }
+  };
 
   const handlePasswordReset = async () => {
     if (!resetEmail) {
-      setError('Por favor, digite seu email.')
-      return
+      setError('Por favor, digite seu email.');
+      return;
     }
 
-    setResetLoading(true)
-    setError(null)
+    setResetLoading(true);
+    setError(null);
 
     try {
-      await resetPassword(resetEmail)
-      setResetSuccess(true)
+      await resetPassword(resetEmail);
+      setResetSuccess(true);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Erro ao enviar email de recuperação')
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Erro ao enviar email de recuperação'
+      );
     } finally {
-      setResetLoading(false)
+      setResetLoading(false);
     }
-  }
+  };
 
   const closeResetDialog = () => {
-    setShowResetDialog(false)
-    setResetEmail('')
-    setResetSuccess(false)
-    setError(null)
-  }
+    setShowResetDialog(false);
+    setResetEmail('');
+    setResetSuccess(false);
+    setError(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-jona-green-50 to-jona-blue-50">
@@ -141,7 +162,9 @@ export default function LoginPage() {
             </div>
             <div className="text-center">
               <h1 className="text-lg font-bold jona-text-gradient">JonA</h1>
-              <p className="text-xs text-muted-foreground">Bem-vindo de volta</p>
+              <p className="text-xs text-muted-foreground">
+                Bem-vindo de volta
+              </p>
             </div>
           </div>
         </div>
@@ -155,7 +178,9 @@ export default function LoginPage() {
         >
           <Card className="shadow-lg border-0">
             <CardHeader className="text-center pb-4">
-              <CardTitle className="text-2xl text-jona-green-700 mb-2">Entrar</CardTitle>
+              <CardTitle className="text-2xl text-jona-green-700 mb-2">
+                Entrar
+              </CardTitle>
               <p className="text-muted-foreground text-sm">
                 Entre na sua conta para continuar sua jornada
               </p>
@@ -180,7 +205,10 @@ export default function LoginPage() {
               {/* Email/Password Form */}
               <form onSubmit={handleEmailSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Email
                   </label>
                   <div className="relative">
@@ -200,7 +228,10 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="password"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Senha
                   </label>
                   <div className="relative">
@@ -222,7 +253,11 @@ export default function LoginPage() {
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       disabled={isLoading}
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -310,8 +345,8 @@ export default function LoginPage() {
                 <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Email Enviado!</h3>
                 <p className="text-muted-foreground text-sm">
-                  Enviamos um link de recuperação para <strong>{resetEmail}</strong>. Verifique sua
-                  caixa de entrada.
+                  Enviamos um link de recuperação para{' '}
+                  <strong>{resetEmail}</strong>. Verifique sua caixa de entrada.
                 </p>
               </motion.div>
             ) : (
@@ -371,5 +406,5 @@ export default function LoginPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

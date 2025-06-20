@@ -1,15 +1,18 @@
-# Prettier configuration
-printWidth: 100
-tabWidth: 2
-useTabs: false
-semi: false
 singleQuote: true
-quoteProps: "as-needed"
-jsxSingleQuote: false
-trailingComma: "es5"
-bracketSpacing: true
-bracketSameLine: false
-arrowParens: "avoid"
-endOfLine: "lf"
-embeddedLanguageFormatting: "auto"
-singleAttributePerLine: false
+trailingComma: es5
+overrides:
+  - files: ["*.yaml", "*.yml"]
+    options:
+      singleQuote: false
+  - files: ["*.ts", "*.tsx"]
+    options:
+      arrowParens: avoid # backward compatible with 1.19, 2.0 new default "always"
+      parser: typescript
+  - files: ["*.js", "*.cjs", "*.mjs"]
+    options:
+      arrowParens: avoid # backward compatible with 1.19, 2.0 new default "always"
+  - files: ["*.svg"]
+    options:
+      parser: html
+plugins:
+  - prettier-plugin-organize-imports
